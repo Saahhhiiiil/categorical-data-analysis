@@ -1,0 +1,80 @@
+---
+title: "Untitled"
+author: "Sahil Kumar"
+date: "2025-06-20"
+output:
+  word_document: default
+  html_document: default
+---
+
+Okay, if you are focusing only on the "define" and "uses" aspects, here are the objectives tailored for that scope:
+
+## Objectives:
+
+**For Task 1: Probability Distributions for Categorical Data**
+
+* To thoroughly define every probability distribution applicable to categorical data in statistics, including their core characteristics and the types of phenomena they model.
+* To identify and elaborate on the real-life use cases for each probability distribution, illustrating their practical applications in diverse scenarios.
+
+**For Task 2: Consistency of MLE for Poisson Distribution**
+
+To simulate Poisson distributed data for various increasing sample sizes.
+To estimate the parameter λ for each simulated dataset using its Maximum Likelihood Estimator (MLE).
+To demonstrate, through a brief simulation study, the consistency of the MLE for λ in the Poisson distribution by observing how the estimated values converge to the true parameter value as the sample size increases.
+
+
+# Task 1–
+
+## 1. Bernoulli Distribution
+Description: Models a single trial with two possible outcomes (success/failure, yes/no, 1/0).
+
+Real-Life Uses:
+
+Modeling coin flips.
+
+Binary outcomes like pass/fail, win/lose, or presence/absence of a disease.
+
+## 2. Binomial Distribution
+Description: Extends the Bernoulli distribution to 
+
+Real-Life Uses:
+
+Quality control (number of defective items in a batch).
+
+Survey responses (number of people favoring a policy).
+
+n independent trials, counting the number of successes.
+
+## 4. Categorical Distribution (Generalized Bernoulli)
+Description: Models a single trial with k possible outcomes (e.g., rolling a die).
+
+Real-Life Uses:
+
+Modeling outcomes of a single multichoice question (e.g., survey responses).
+
+Natural language processing (word distributions in topics).
+
+
+
+
+```{r}
+set.seed(123)
+lambda_true <- 3.9
+sample_sizes <- c(20, 40, 80, 550, 1080, 109000)
+lambda_mle_values <- numeric(length(sample_sizes))
+
+for (i in seq_along(sample_sizes)) {
+  x <- rpois(sample_sizes[i], lambda_true)
+  lambda_mle_values[i] <- mean(x)
+}
+
+result <- data.frame(Sample_Size = sample_sizes, MLE_Lambda = lambda_mle_values)
+print(result)
+
+plot(sample_sizes, lambda_mle_values, type = "b", col = "blue", pch = 19,
+     xlab = "Sample Size", ylab = "MLE of Lambda",
+     main = "Consistency of MLE for Poisson Distribution")
+abline(h = lambda_true, col = "red", lty = 2)
+
+```
+
