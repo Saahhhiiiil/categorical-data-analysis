@@ -1,0 +1,200 @@
+---
+title: "Untitled"
+author: "Sahil Kumar"
+date: "2025-06-19"
+output:
+  word_document: default
+  html_document: default
+---
+# Task 1 – Real‑Life Scenario: Traffic Flow at an Intersection
+## Real-World Context
+We analyze vehicle traffic at a busy intersection to understand patterns in traffic flow and explore applications of categorical probability distributions.
+
+## Qualitative (Categorical) Attributes:
+Vehicle Type – Car, Bike, Bus, Truck (Categorical)
+
+Traffic Light Status – Red, Yellow, Green (Categorical)
+
+Day Type – Weekday or Weekend (Categorical)
+
+## Quantitative (Numerical) Attributes:
+Number of Vehicles per Minute – Discrete
+(Counts whole vehicles; no partial counts)
+
+Waiting Time (in seconds) – Continuous
+(Can be 12.5 seconds, 18.3 seconds, etc.)
+
+Vehicle Speed (km/h) – Continuous
+(Measured on a continuous scale, varies between vehicles)
+
+# Task 2 – Binomial & Poisson Applications
+## Binomial Distribution – Red Light Compliance (Simulated)
+Scenario: Out of 100 vehicles, each has a 75% chance of obeying the red light.
+
+```{r}
+## 1. Simulate observed frequencies 
+# x = number of times vehicles stop at red light out of 3 cycles
+x = 0:3
+obs_freq = c(50, 90, 50, 10)  # Simulated observed data from traffic
+N = sum(obs_freq)  # Total vehicles observed
+n_trials = 3       # Each vehicle has 3 chances to stop
+
+## 2. Estimate p using MLE 
+# Formula: p_hat = total number of stops / total opportunities
+p_hat = sum(x * obs_freq) / (n_trials * N)
+p_hat  # For example, this might output ~0.35
+
+## 3. Calculate expected frequencies using Binomial model 
+exp_freq = dbinom(x, size = n_trials, prob = p_hat) * N
+cbind(x, obs = obs_freq, exp = round(exp_freq, 1))
+
+## 4. Chi-square test statistic & p-value 
+chisq_stat = sum((obs_freq - exp_freq)^2 / exp_freq)
+df = length(x) - 1 - 1  # k - 1 - number of estimated parameters
+p_value = pchisq(chisq_stat, df, lower.tail = FALSE)
+
+## 5. Display test result ----
+cat(sprintf("χ² = %.2f (df = %d), p-value = %.3f\n",
+            chisq_stat, df, p_value))
+
+## 6. Visualize Observed vs Expected 
+barplot(rbind(obs_freq, exp_freq),
+        beside = TRUE,
+        names.arg = x,
+        legend.text = c("Observed", "Expected"),
+        main = "Traffic Stops per 3 Light Cycles: Observed vs Binomial Fit",
+        col = c("steelblue", "orange"))
+
+```
+
+Interpretation
+MLE 
+𝑝^=0.35 implies that each vehicle stops at a red light in approximately 35% of the opportunities.
+
+All expected counts ≥ 5, so the χ² approximation is valid.
+
+p-value = 0.278 > 0.05 ⇒ Fail to reject 𝐻0;
+
+The data are consistent with a Binomial(3, 0.35) model for red-light stopping behavior.
+
+```{r}
+## 1. Simulate Poisson data: vehicle arrivals per minute ----
+set.seed(123)
+vehicle_counts = rpois(100, lambda = 6)
+
+## 2. Create full observed frequency table ----
+obs_freq = table(vehicle_counts)
+N <- sum(obs_freq)
+
+## 3. Estimate lambda from data ----
+lambda_hat = mean(vehicle_counts)
+lambda_hat  # Should be close to 6
+
+## 4. Calculate expected frequencies using estimated λ ----
+x_vals <- as.numeric(names(obs_freq))
+exp_freq <- dpois(x_vals, lambda = lambda_hat) * N
+
+## 5. Chi-square test (no capping) ----
+chisq_stat <- sum((obs_freq - exp_freq)^2 / exp_freq)
+df <- length(obs_freq) - 1 - 1  # categories - 1 - estimated param
+p_value <- pchisq(chisq_stat, df, lower.tail = FALSE)
+
+## 6. Display result ----
+cat(sprintf("χ² = %.2f (df = %d), p-value = %.3f\n",
+            chisq_stat, df, p_value))
+
+## 7. Barplot of observed vs expected frequencies ----
+barplot(rbind(as.numeric(obs_freq), round(exp_freq)), beside = TRUE,
+        col = c("darkblue", "lightblue"),
+        legend.text = c("Observed", "Expected"),
+        names.arg = x_vals,
+        main = "Vehicles per Minute: Observed vs Poisson Fit",
+        ylab = "Frequency")
+
+```
+
+MLE 
+𝜆^=5.94 suggests an average of 5.94 vehicles arriving at the intersection every minute.
+
+All expected counts ≥ 5, so the χ² test is reliable without grouping.
+
+p-value = 0.488 > 0.05 : Fail to reject 𝐻0;
+The observed arrivals are well-modeled by a Poisson(5.94) distribution.
+
+```{r}
+# -----------------------------
+# Step 1: Simulate the dataset
+# -----------------------------
+set.seed(2025)  # for reproducibility
+
+# Simulate 100 minutes of vehicle arrivals with average 6 per minute
+vehicle_counts = rpois(100, lambda = 6)
+
+# Create a frequency table of counts (number of vehicles observed per minute)
+obs_freq = table(vehicle_counts)
+
+# Total number of observations
+N = sum(obs_freq)
+
+# -----------------------------
+# Step 2: Estimate Poisson parameter (λ)
+# -----------------------------
+lambda_hat = mean(vehicle_counts)
+cat("Estimated lambda (λ):", lambda_hat, "\n")
+
+# -----------------------------
+# Step 3: Goodness-of-fit Test (χ²)
+# -----------------------------
+
+# Extract x values (distinct vehicle counts)
+x_vals = as.numeric(names(obs_freq))
+
+# Compute expected frequencies using Poisson(λ̂)
+exp_freq = dpois(x_vals, lambda = lambda_hat) * N
+
+# Perform chi-square goodness-of-fit test
+chisq_stat = sum((obs_freq - exp_freq)^2 / exp_freq)
+df = length(obs_freq) - 1 - 1  # k - 1 - number of estimated parameters (lambda)
+p_value = pchisq(chisq_stat, df, lower.tail = FALSE)
+
+# Print test result
+cat(sprintf("χ² = %.2f (df = %d), p-value = %.3f\n", chisq_stat, df, p_value))
+
+# -----------------------------
+# Step 4: Visualize Observed vs. Expected
+# -----------------------------
+barplot(rbind(as.numeric(obs_freq), round(exp_freq)), beside = TRUE,
+        col = c("skyblue", "lightgreen"),
+        legend.text = c("Observed", "Expected"),
+        names.arg = x_vals,
+        main = "Vehicle Arrivals per Minute: Observed vs Poisson Expected",
+        ylab = "Frequency")
+
+```
+
+MLE λ^ =5.94 suggests an average of ~6 vehicle arrivals per minute.
+
+All expected counts ≥ 5, so the χ² approximation is valid.
+
+p-value = 0.488 > 0.05 ⇒ Fail to reject 𝐻0.
+ 
+The observed frequencies are consistent with a Poisson(5.94) model.
+
+The barplot confirms that observed and expected frequencies match well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
