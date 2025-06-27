@@ -1,0 +1,84 @@
+---
+title: "Untitled"
+author: "Sahil Kumar"
+date: "2025-03-13"
+output:
+  word_document: default
+  html_document: default
+---
+
+# Explain the three types of Chi-square tests and when to apply Fisher’s Exact Test.
+
+The Chi-square test is a statistical method used to examine relationships between categorical variables. There are three main types of Chi-square tests, each with specific applications:
+
+## 1. Chi-square Goodness-of-Fit Test
+
+The Chi-square goodness of fit test is a statistical hypothesis test used to determine whether a variable is likely to come from a specified distribution or not. It is often used to evaluate whether sample data is representative of the full population.
+
+You can use the test when you have counts of values for a categorical variable.
+
+The Chi-square goodness of fit test checks whether your sample data is likely to be from a specific theoretical distribution. We have a set of data values, and an idea about how the data values are distributed. The test gives us a way to decide if the data values have a “good enough” fit to our idea, or if our idea is questionable.
+
+### Formula: 
+
+## 2. Chi-square Test of Independence
+
+The Chi-square test of independence is a statistical hypothesis test used to determine whether two categorical or nominal variables are likely to be related or not.
+
+You can use the test when you have counts of values for two categorical variables.
+
+The Chi-square test of independence checks whether two variables are likely to be related or not. We have counts for two categorical or nominal variables. We also have an idea that the two variables are not related. The test gives us a way to decide if our idea is plausible or not.
+
+### Formula:
+
+## 3. Chi-square Test of Homogeneity
+
+The test is applied to a single categorical variable from two or more different populations. It is used to determine whether frequency counts are distributed identically across different populations.
+
+For example, in a survey of TV viewing preferences, we might ask respondents to identify their favorite program. We might ask the same question of two different populations, such as males and females. We could use a chi-square test for homogeneity to determine whether male viewing preferences differed significantly from female viewing preferences.
+
+### Formula:
+
+# When to Use Fisher’s Exact Test Instead of Chi-square?
+
+Fisher’s Exact Test is an alternative to the Chi-square test of independence when:
+
+Small sample sizes (expected cell counts < 5 in >20% of cells).
+
+Unbalanced or sparse data (e.g., rare events in medical studies).
+
+2×2 contingency tables (though extensions exist for larger tables).
+
+
+The Chi-square test relies on approximations that fail with small samples, whereas Fisher’s Exact Test computes exact probabilities using the hypergeometric distribution.
+
+# Identify a real-world medical situation where McNemar’s test is applicable. Apply the test framework and write the conclusion.
+
+## Scenario: 
+A medical researcher wants to evaluate the effectiveness of a new diagnostic test for detecting a disease (e.g., COVID-19)compared to an existing gold-standard test.The same group of patients is tested twice—once with the new test and once with the standard test—to check for agreement/disagreement.
+
+
+
+```{r}
+
+# Create a 2x2 contingency table representing the counts of symptom relief outcomes
+data <- matrix(c(50, 10, 15, 75), nrow = 2,
+               dimnames = list("Gold Standard" = c("Positive", "Negative"),
+                               "New Test" = c("Positive", "Negative")))
+
+# Display the contingency table
+print("Contingency table:")
+print(data)
+
+# Perform McNemar's Test with continuity correction
+result_with_correction = mcnemar.test(data)
+print("McNemar's Test with continuity correction:")
+print(result_with_correction)
+
+# Perform McNemar's Test without continuity correction
+result_without_correction = mcnemar.test(data, correct = FALSE)
+print("McNemar's Test without continuity correction:")
+print(result_without_correction)
+
+```
+
