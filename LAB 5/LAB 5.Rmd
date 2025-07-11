@@ -1,0 +1,95 @@
+---
+title: "Untitled"
+author: "Sahil Kumar"
+date: "2025-07-11"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r}
+# Load necessary libraries
+library(pROC)
+library(caret)
+
+data = read.csv("E:/Christ/Trimester 4/Assignments/Categorical/LAB 5/framingham.csv")
+head(data)
+
+# Remove rows with missing values
+df_cleaned = na.omit(data)
+head(df_cleaned)
+
+summary(df_cleaned)
+```
+
+
+```{r}
+# Convert 'TenYearCHD' to a factor for classification
+df_cleaned$TenYearCHD = as.factor(df_cleaned$TenYearCHD)
+```
+
+
+```{r}
+# Data Partitioning (70% train, 30% test)
+set.seed(123) # For reproducibility
+sample_index = createDataPartition(df_cleaned$TenYearCHD, p = 0.7, list = FALSE)
+train = df_cleaned[sample_index, ]
+test = df_cleaned[-sample_index, ]
+```
+
+
+```{r}
+# Model Fitting - using all predictors
+model <- glm(TenYearCHD ~ ., family = "binomial", data = train)
+summary(model)
+
+p_train <- predict(model, newdata = train, type = "response")
+head(p_train)
+
+p_test <- predict(model, newdata = test, type = "response")
+head(p_test)
+```
+
+
+```{r}
+# Confusion Matrix & Metrics (using 0.5 threshold)
+threshold <- 0.5
+pred_class <- ifelse(p_train > threshold, 1, 0)
+actual_class <- as.numeric(as.character(test$TenYearCHD))
+
+conf_mat <- table(Predicted = pred_class, Actual = train$TenYearCHD)
+conf_mat
+```
+
+
+```{r}
+# Calculate performance metrics
+accuracy <- sum(diag(conf_mat))/sum(conf_mat)
+sensitivity <- conf_mat[2,2]/sum(conf_mat[,2]) # True Positive Rate
+specificity <- conf_mat[1,1]/sum(conf_mat[,1]) # True Negative Rate
+
+cat("Accuracy:", accuracy, "\n")
+cat("Sensitivity:", sensitivity, "\n")
+cat("Specificity:", specificity, "\n")
+```
+
+
+```{r}
+# ROC Curve & AUC on test set
+roc_obj = roc(actual_class, p_test)
+roc_obj
+```
+
+
+```{r}
+# Plot ROC curve
+plot(roc_obj, main = "ROC Curve: CHD Risk Prediction")
+```
+
+
+```{r}
+# Calculate AUC
+auc_value = auc(roc_obj)
+print(paste("AUC:", round(auc_value, 3)))
+```
+
